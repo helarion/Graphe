@@ -1,0 +1,5 @@
+# depslib dependency file v1.0
+1493999996 source:c:\users\thibault\desktop\projet graphe\graphe\main.c
+	<stdio.h>
+	<string.h>
+

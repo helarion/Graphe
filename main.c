@@ -337,7 +337,7 @@ case 2:
 	afficherMatrice(m1);
 
 	printf("sauvegarder graphe ? y/n\n");
-	scanf("%c",&choix2);
+	scanf(" %c",&choix2);
 	switch (choix2)
 	{
 		case 'y':

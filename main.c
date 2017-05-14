@@ -1,7 +1,5 @@
 #include <stdio.h>
 #include <string.h>
-#include "file.h"
-#include "file.c"
 
 #define TAILLE_MAX 1000
 
@@ -274,47 +272,9 @@ struct Matrice setGraphe(int type)
     return m;
 }
 
-void parcoursLargeur(struct Matrice m){
-
-	File *maFile = initialiser();
-	int i;
-	int j;
-/*
-	for(i=0;i<m.tailleX;i++)
-	{
-		for(j=0;j<m.tailleY;j++)
-		{
-		 if(m.matAdj[i][j]!=0){
-		 	enfiler(j);
-		 	printf("%d",mafile[0]);
-		 }
-
-		}
-	}*/
-
-
-	enfiler(maFile, 4);
-    enfiler(maFile, 8);
-    enfiler(maFile, 15);
-
-    printf("premier element  :%d",getPremierElement(maFile));
-    printf("\nEtat de la file :\n");
-    afficherFile(maFile);
-
-    printf("\nJe defile %d\n", defiler(maFile));
-    printf("Je defile %d\n", defiler(maFile));
-
-    printf("\nEtat de la file :\n");
-    afficherFile(maFile);
-
-
-}
-
 int main()
 {
 struct Matrice m1;
-
-/*
 char nomGraphe[100];
 int type1;
 int type2;
@@ -395,13 +355,5 @@ default:
   printf("Erreur de saisie");
 break;
 }
-
-*/
-
-//m1=getMatriceAdj("matrice.txt");
-//afficherMatrice(m1);
-
-parcoursLargeur(m1);
-
 return 0;
 }

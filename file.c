@@ -87,13 +87,23 @@ int getPremierElement(File *file)
     {
      exit(EXIT_FAILURE);
     }
-    first = file->premier;
 
-
-    return first;
+    Element *element = file->premier;
+    return element->nombre;
 
 }
 
+int estVide(File *file)
+{
+    Element *element = file->premier;
+    if(element==NULL){
+        return 0;
+    }else{
+        return -1;
+    }
+
+
+}
 
 
 

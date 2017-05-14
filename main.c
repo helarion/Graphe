@@ -4,6 +4,9 @@
 #include "file.c"
 
 #define TAILLE_MAX 1000
+File *maFile;
+int compteurSommetsPasses=0;
+int SommetsPasses[50];
 
 struct Matrice
 {
@@ -274,41 +277,72 @@ struct Matrice setGraphe(int type)
     return m;
 }
 
-void parcoursLargeur(struct Matrice m){
+void RechercheVoisins(int depart,struct Matrice m){
 
-	File *maFile = initialiser();
-	int i;
-	int j;
-/*
-	for(i=0;i<m.tailleX;i++)
+	int i=0;
+	int j=0;
+
+	int flag=0;
+
+	for(i=0;i<m.tailleY;i++)
 	{
-		for(j=0;j<m.tailleY;j++)
-		{
-		 if(m.matAdj[i][j]!=0){
-		 	enfiler(j);
-		 	printf("%d",mafile[0]);
-		 }
-
-		}
-	}*/
-
-
-	enfiler(maFile, 4);
-    enfiler(maFile, 8);
-    enfiler(maFile, 15);
-
-    printf("premier element  :%d",getPremierElement(maFile));
-    printf("\nEtat de la file :\n");
-    afficherFile(maFile);
-
-    printf("\nJe defile %d\n", defiler(maFile));
-    printf("Je defile %d\n", defiler(maFile));
-
-    printf("\nEtat de la file :\n");
-    afficherFile(maFile);
-
+		if(m.matAdj[depart][i]!=0)
+			{
+				//printf("%d est voisin avec %d \n",depart,i);
+				for(j=0;j<50;j++){
+					if(i==SommetsPasses[j]){
+						//printf("%d est deja passé \n", i);
+						flag=1;
+						break;
+					}
+				}
+				if(flag!=1){
+						enfiler(maFile,i);
+						//printf("ajout de : %d en sommet passé \n",depart);
+						SommetsPasses[compteurSommetsPasses]=depart;
+						
+					}
+				j=0;
+				flag=0;
+			}
+	}
+	compteurSommetsPasses++;
 
 }
+
+
+void parcoursLargeur(struct Matrice m)
+{
+
+	maFile =initialiser();
+	int i=0;
+	int j=0;
+	int parcours[50];
+
+	int compteur=0;
+	enfiler(maFile,0);
+	int flag=0;
+
+
+	while(estVide(maFile)!=0){
+
+		RechercheVoisins(getPremierElement(maFile),m);
+		parcours[compteur]=getPremierElement(maFile);
+		compteur++;
+		defiler(maFile);
+		//afficherFile(maFile);
+	}
+	
+	for(i=0;i<m.tailleX;i++){
+		printf("%d ->",parcours[i]);
+	}
+	printf("\n");
+	
+}
+
+
+
+
 
 int main()
 {
@@ -398,7 +432,7 @@ break;
 
 */
 
-//m1=getMatriceAdj("matrice.txt");
+m1=getMatriceAdj("matrice.txt");
 //afficherMatrice(m1);
 
 parcoursLargeur(m1);

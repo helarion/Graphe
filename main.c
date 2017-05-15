@@ -357,7 +357,9 @@ void RechercheVoisinsProfondeur(int depart,struct Matrice m){
 
 	int i=0;
 	int j=0;
+	int k=0;
 	int flag=0;
+	int flag2=0;
 	int compteurSucesseurs=0;
 	int fin;
 	sommetsvisites[compteurVisite]=depart;
@@ -377,6 +379,12 @@ void RechercheVoisinsProfondeur(int depart,struct Matrice m){
 		printf("%d n'a pas de descendant : marquage \n",depart);
 		sommetsMarques[compteurMarque]=depart;
 		compteurMarque++;
+		for(k=0;k<50;k++){
+			if(sommetsvisites[k]==depart){
+				printf("suppression de %d des commets visités",depart);
+				sommetsvisites[k]=-1;
+			}
+		}
 		depiler(maPile);
 		return;
 	}
@@ -393,6 +401,7 @@ void RechercheVoisinsProfondeur(int depart,struct Matrice m){
 			printf("voisin trouvé en : %d \n",i);
 			for(j=0;j<50;j++){
 				// si ce voisin est marqué
+				printf("j: %d",j);
 				if(i==sommetsMarques[j]){
 					printf("voisin déjà marqué, next :\n");
 					flag=1;
@@ -403,14 +412,13 @@ void RechercheVoisinsProfondeur(int depart,struct Matrice m){
 					flag=1;
 					break;
 				}
-
-				// si voisin non marqué
+			}
+			// si voisin non marqué
 				if(flag!=1){
 				printf("voisin non marqué ni visité, ajout à la pile \n");
 				empiler(maPile,i);
 				return;
 			   	}
-			}
 				flag=0;
 				
 		}
@@ -436,7 +444,7 @@ void parcoursProfondeur(struct Matrice m)
 	}
 
 	//while(estVideP(maPile)!=0){
-	for(i=0;i<10;i++){
+	for(i=0;i<7;i++){
 		printf("premier element de la pile : %d \n",getPremierElementP(maPile));
 		RechercheVoisinsProfondeur(getPremierElementP(maPile),m);
 		printf("Pile : \n");

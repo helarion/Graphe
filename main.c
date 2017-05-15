@@ -2,11 +2,19 @@
 #include <string.h>
 #include "file.h"
 #include "file.c"
+#include "pile.h"
+#include "pile.c"
 
 #define TAILLE_MAX 1000
 File *maFile;
+Pile *maPile;
 int compteurSommetsPasses=0;
 int SommetsPasses[50];
+
+int sommetsMarques[50];
+int sommetsvisites[50];
+int compteurMarque=0;
+int compteurVisite=0;
 
 struct Matrice
 {
@@ -337,9 +345,112 @@ void parcoursLargeur(struct Matrice m)
 		printf("%d ->",parcours[i]);
 	}
 	printf("\n");
+	compteurSommetsPasses=0;
+	for(i=0;i<50;i++){
+	SommetsPasses[i]=0;
+	}
 	
 }
 
+
+void RechercheVoisinsProfondeur(int depart,struct Matrice m){
+
+	int i=0;
+	int j=0;
+	int flag=0;
+	int compteurSucesseurs=0;
+	int fin;
+	sommetsvisites[compteurVisite]=depart;
+	compteurVisite++;
+	
+	
+	printf("depart : %d \n",depart);
+	for(i=0;i<m.tailleY;i++)
+	{
+		// si depart a un voisin
+		if(m.matAdj[depart][i]!=0)
+		{
+			compteurSucesseurs++;
+		}
+	}
+	if(compteurSucesseurs<=1){
+		printf("%d n'a pas de descendant : marquage \n",depart);
+		sommetsMarques[compteurMarque]=depart;
+		compteurMarque++;
+		depiler(maPile);
+		return;
+	}
+	compteurSucesseurs=0;
+	
+	//parcours voisins de depart
+	for(i=0;i<m.tailleY;i++)
+	{
+		printf("parcours de voisin \n");
+		// si depart a un voisin
+		printf("recherche en [%d][%d] \n",depart,i);
+		if(m.matAdj[depart][i]!=0)
+		{
+			printf("voisin trouvé en : %d \n",i);
+			for(j=0;j<50;j++){
+				// si ce voisin est marqué
+				if(i==sommetsMarques[j]){
+					printf("voisin déjà marqué, next :\n");
+					flag=1;
+					break;
+				}
+				if(i==sommetsvisites[i]){
+					printf("voisin déjà visité, next :\n");
+					flag=1;
+					break;
+				}
+
+				// si voisin non marqué
+				if(flag!=1){
+				printf("voisin non marqué ni visité, ajout à la pile \n");
+				empiler(maPile,i);
+				return;
+			   	}
+			}
+				flag=0;
+				
+		}
+
+	}
+
+}
+
+
+
+
+void parcoursProfondeur(struct Matrice m)
+{
+	maPile= initialiserP();
+	empiler(maPile,0);
+	int i=0;
+	int j=0;
+	for(i=0;i<50;i++){
+		sommetsMarques[i]=-1;
+	}
+	for(i=0;i<50;i++){
+		sommetsvisites[i]=-1;
+	}
+
+	//while(estVideP(maPile)!=0){
+	for(i=0;i<10;i++){
+		printf("premier element de la pile : %d \n",getPremierElementP(maPile));
+		RechercheVoisinsProfondeur(getPremierElementP(maPile),m);
+		printf("Pile : \n");
+		printf("___debut ___\n");
+		afficherPile(maPile);
+		printf("___fin ___\n");
+		printf("sommets marqués :  sommets visités :\n");
+		for(j=0;j<7;j++){
+			printf("%d                  %d\n",sommetsMarques[j],sommetsvisites[j]);
+		}
+
+	}
+
+}
 
 
 
@@ -435,7 +546,9 @@ break;
 m1=getMatriceAdj("matrice.txt");
 //afficherMatrice(m1);
 
-parcoursLargeur(m1);
+//parcoursLargeur(m1);
+
+parcoursProfondeur(m1);
 
 return 0;
 }

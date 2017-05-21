@@ -5,7 +5,10 @@
 #include "pile.h"
 #include "pile.c"
 
+#define ADJACENCE 1
+#define INCIDENCE 2
 #define TAILLE_MAX 1000
+
 File *maFile;
 Pile *maPile;
 int compteurSommetsPasses=0;
@@ -16,7 +19,7 @@ int sommetsvisites[50];
 int compteurMarque=0;
 int compteurVisite=0;
 
-struct Matrice
+struct Graphe
 {
 	int tailleX;
 	int tailleY;
@@ -27,88 +30,88 @@ struct Matrice
 	int matInc[100][100]; // booleene
 };
 
-void AdjToInc(struct Matrice *m){
+void AdjToInc(struct Graphe *g){
 	int i,j,tailleX,tailleY;
 	int c=0;
 
-    tailleX=m->tailleX;
-    tailleY=m->tailleY;
+    tailleX=g->tailleX;
+    tailleY=g->tailleY;
 
-    //printf("test 1\n");
+    printf("x:%d y:%d\n",tailleX, tailleY);
 
     for(i=0;i<tailleX;i++)
     {
         for(j=i+1;j<tailleY;j++)
         {
-        	if(m->matAdj[i][j]!=0) c++;
+        	if(g->matAdj[i][j]!=0) c++;
         }
     }
 
-    m->tailleInc=c;
+    g->tailleInc=c;
+    c=0;
 
     for(i=0;i<tailleX;i++)
     {
-    	c=0;
         for(j=i+1;j<tailleY;j++)
         {
-        	if(m->matAdj[i][j]!=0)
+        	if(g->matAdj[i][j]!=0)
         	{
-        		m->matInc[i][c]=1;
-        		m->matInc[j][c]=1;
-        		m->matInc[tailleX][c]=m->matAdj[i][j];
+        		g->matInc[i][c]=1;
+        		g->matInc[j][c]=1;
+        		g->matInc[tailleX][c]=g->matAdj[i][j];
         		c++;
         	}
+
         }
     }
-   
 }
 
-void IncToAdj(struct Matrice *m){
+void IncToAdj(struct Graphe *g){
 	int i,j,tailleX,tailleY;
 	int poids;
 
-    tailleX=m->tailleInc-1;
-    tailleY=m->tailleX;
+    tailleX=g->tailleInc-1;
+    tailleY=g->tailleX;
 
     for(i=0;i<tailleX+1;i++)
     {
-    	poids=m->matInc[m->tailleInc+1][i];
+    	poids=g->matInc[g->tailleInc+1][i];
 
-        for(j=0;j<m->tailleInc;j++)
+        for(j=0;j<g->tailleInc;j++)
         {
 
-        	if(m->matInc[j][i]!=0)
+        	if(g->matInc[j][i]!=0)
         	{
         		//printf("poids : %d i: %d j: %d \n",poids,i,j);
-        		m->matAdj[j][i]=poids;
-        		m->matAdj[i][j]=poids;
+        		g->matAdj[j][i]=poids;
+        		g->matAdj[i][j]=poids;
         	}
         }
     }
 
-    m->tailleY=tailleY;
-   
+    g->tailleY=tailleY;
+
 }
 
-void afficherMatrice(struct Matrice m)
+void afficherMatrice(struct Graphe g)
 {
     int i;
     int j;
 
     int compteur=0;
 
-    printf("x: %d,y: %d, inc: %d \n",m.tailleX,m.tailleY,m.tailleInc);
+    printf("x: %d,y: %d, inc: %d \n",g.tailleX,g.tailleY,g.tailleInc);
 
 
     printf("Matrice d'adjacence:\n");
-	for(i=0;i<m.tailleX;i++)
+	for(i=0;i<g.tailleX;i++)
 	{
-		for(j=0;j<m.tailleY;j++)
+		for(j=0;j<g.tailleY;j++)
 		{
-			printf("%d",m.matAdj[i][j]);
-			if(j!=m.tailleY-1)
+			printf("%d",g.matAdj[i][j]);
+			if(j!=g.tailleY-1)
 			{
-				printf("-");	
+				printf("-");
 			}
 		}
 		printf("\n");
@@ -117,22 +120,22 @@ void afficherMatrice(struct Matrice m)
 	printf("Matrice d'incidence:\n");
 
 	printf("arcs --> \n");
-	for(i=0;i<m.tailleX+1;i++)
+	for(i=0;i<g.tailleX+1;i++)
 	{
-		for(j=0;j<m.tailleInc;j++)
+		for(j=0;j<g.tailleInc;j++)
 		{
-			printf("%d",m.matInc[i][j]);
-			if(j!=m.tailleInc-1)
+			printf("%d",g.matInc[i][j]);
+			if(j!=g.tailleInc-1)
 			{
-				printf("-");	
+				printf("-");
 			}
 		}
 		printf("\n");
 	}
-	
+
 }
 
-struct Matrice getMatriceAdj(char* nomFichier)
+struct Graphe getMatrice(char* nomFichier)
 {
 	FILE *fp;
 	fp = fopen(nomFichier, "r");
@@ -142,34 +145,55 @@ struct Matrice getMatriceAdj(char* nomFichier)
 	  return;
 	}
 
-	struct Matrice m;
+	struct Graphe g;
     int c;
-    int compteur=0;
 
     int i=0;
     int j=0;
 
+    int type;
     fscanf(fp,"%d",&c);
-    m.tailleX=c;
-    fscanf(fp,"%d",&c);
-    m.tailleY=c;
+    type=c;
 
-    for(i=0;i<m.tailleX;i++)
+    //printf("type:%d\n",type);
+
+    if(type==ADJACENCE)
     {
-        for(j=0;j<m.tailleY;j++)
+        fscanf(fp,"%d",&c);
+        g.tailleX=c;
+        fscanf(fp,"%d",&c);
+        g.tailleY=c;
+        for(i=0;i<g.tailleX;i++)
         {
-            fscanf(fp,"%d",&c);
-            m.matAdj[i][j]=c;
+            for(j=0;j<g.tailleY;j++)
+            {
+                fscanf(fp,"%d",&c);
+                g.matAdj[i][j]=c;
+            }
         }
+        AdjToInc(&g);
+    }
+    else if(type==INCIDENCE)
+    {
+        fscanf(fp,"%d",&c);
+        g.tailleInc=c;
+        fscanf(fp,"%d",&c);
+        g.tailleX=c-1;
+        for(i=0;i<g.tailleX+1;i++)
+        {
+            for(j=0;j<g.tailleInc;j++)
+            {
+                fscanf(fp,"%d",&c);
+                g.matInc[i][j]=c;
+            }
+        }
+        IncToAdj(&g);
     }
     fclose(fp);
-
-    AdjToInc(&m);
-
-	return m;
+	return g;
 }
 
-struct Matrice getMatriceInc(char* nomFichier)
+struct Graphe getMatriceInc(char* nomFichier)
 {
 	FILE *fp;
 	fp = fopen(nomFichier, "r");
@@ -179,7 +203,7 @@ struct Matrice getMatriceInc(char* nomFichier)
 	  return;
 	}
 
-	struct Matrice m;
+	struct Graphe g;
     int c;
     int compteur=0;
 
@@ -187,28 +211,28 @@ struct Matrice getMatriceInc(char* nomFichier)
     int j=0;
 
     fscanf(fp,"%d",&c);
-    m.tailleInc=c;
+    g.tailleInc=c;
     fscanf(fp,"%d",&c);
-    m.tailleX=c-1;
+    g.tailleX=c-1;
 
-    for(i=0;i<m.tailleX+1;i++)
+    for(i=0;i<g.tailleX+1;i++)
     {
-        for(j=0;j<m.tailleInc;j++)
+        for(j=0;j<g.tailleInc;j++)
         {
             fscanf(fp,"%d",&c);
             //printf("c:%d \n",c);
-            m.matInc[i][j]=c;
+            g.matInc[i][j]=c;
         }
     }
 
     fclose(fp);
 
-    IncToAdj(&m);
+    IncToAdj(&g);
 
-	return m;
+	return g;
 }
 
-void saveGraphe(struct Matrice m)
+void saveGraphe(struct Graphe g)
 {
     FILE *f;
     char nomGraphe [50];
@@ -227,43 +251,44 @@ void saveGraphe(struct Matrice m)
         freopen(chemin, "w", f);
     }
     char* write;
-    sprintf(write, "%d", m.tailleX);
+    sprintf(write, "%d", g.tailleX);
     fprintf(f,"%s",write);
     fprintf(f," ");
-    sprintf(write,"%d", m.tailleY);
+    sprintf(write,"%d", g.tailleY);
     fprintf(f,"%s",write);
     fprintf(f,"\n");
-    for(i=0;i<m.tailleX;i++)
+    for(i=0;i<g.tailleX;i++)
 	    {
-	        for(j=0;j<m.tailleY;j++)
+	        for(j=0;j<g.tailleY;j++)
 	        {
-	        	sprintf(write, "%d", m.matAdj[i][j]);
-	        	if(j<m.tailleY-1) strcat(write," ");
+	        	sprintf(write, "%d", g.matAdj[i][j]);
+	        	if(j<g.tailleY-1) strcat(write," ");
 	        	fprintf(f,"%s",write);
 	        }
-	        if(i<m.tailleX-1) fprintf(f,"\n");
+	        if(i<g.tailleX-1) fprintf(f,"\n");
 	    }
     fclose(f);
 }
 
-struct Matrice setGraphe(int type)
+struct Graphe setGraphe(int type)
 {
-
     int tailleX;
     int tailleY;
-    struct Matrice m;
+    struct Graphe g;
 
-    printf("Entrez la taille x de la matrice: /| \n");
-    scanf("%d",&tailleX);
-    if(type==2){
-    	tailleY=tailleX;
-    }else{
-    printf("Entrez la taille y de la matrice: --> \n");
+    printf("Entrez la taille x de la matrice: --> \n");
     scanf("%d",&tailleY);
+    if(type==ADJACENCE){
+    	tailleX=tailleY;
+    }
+    else if(type==INCIDENCE){
+        printf("Entrez la taille y de la matrice: | \n");
+        scanf("%d",&tailleX);
+        g.tailleInc=tailleX;
 	}
 
-    m.tailleX=tailleX;
-    m.tailleY=tailleY;
+    g.tailleX=tailleX;
+    g.tailleY=tailleY;
 
     int i,j,val;
     for(i=0;i<tailleX;i++)
@@ -272,29 +297,32 @@ struct Matrice setGraphe(int type)
         {
             printf("[%d][%d]:",i,j);
             scanf("%d",&val);
-            if(type==1){
-            	m.tailleInc=tailleY;
-            	m.matInc[i][j]=val;
+            if(type==INCIDENCE){
+            	g.matInc[i][j]=val;
             }
-            if(type==2){
-            	m.matAdj[i][j]=val;	
+            if(type==ADJACENCE){
+            	g.matAdj[i][j]=val;
             }
 
         }
     }
-    return m;
+
+    if(type==ADJACENCE) AdjToInc(&g);
+    else if(type==INCIDENCE) IncToAdj(&g);
+
+    return g;
 }
 
-void RechercheVoisins(int depart,struct Matrice m){
+void RechercheVoisins(int depart,struct Graphe g){
 
 	int i=0;
 	int j=0;
 
 	int flag=0;
 
-	for(i=0;i<m.tailleY;i++)
+	for(i=0;i<g.tailleY;i++)
 	{
-		if(m.matAdj[depart][i]!=0)
+		if(g.matAdj[depart][i]!=0)
 			{
 				//printf("%d est voisin avec %d \n",depart,i);
 				for(j=0;j<50;j++){
@@ -308,7 +336,7 @@ void RechercheVoisins(int depart,struct Matrice m){
 						enfiler(maFile,i);
 						//printf("ajout de : %d en sommet passé \n",depart);
 						SommetsPasses[compteurSommetsPasses]=depart;
-						
+
 					}
 				j=0;
 				flag=0;
@@ -318,8 +346,7 @@ void RechercheVoisins(int depart,struct Matrice m){
 
 }
 
-
-void parcoursLargeur(struct Matrice m)
+void parcoursLargeur(struct Graphe g)
 {
 
 	maFile =initialiser();
@@ -334,14 +361,14 @@ void parcoursLargeur(struct Matrice m)
 
 	while(estVide(maFile)!=0){
 
-		RechercheVoisins(getPremierElement(maFile),m);
+		RechercheVoisins(getPremierElement(maFile),g);
 		parcours[compteur]=getPremierElement(maFile);
 		compteur++;
 		defiler(maFile);
 		//afficherFile(maFile);
 	}
-	
-	for(i=0;i<m.tailleX;i++){
+
+	for(i=0;i<g.tailleX;i++){
 		printf("%d ->",parcours[i]);
 	}
 	printf("\n");
@@ -349,12 +376,11 @@ void parcoursLargeur(struct Matrice m)
 	for(i=0;i<50;i++){
 	SommetsPasses[i]=0;
 	}
-	
+
 }
 
-
-void RechercheVoisinsProfondeur(int depart,struct Matrice m){
-
+void RechercheVoisinsProfondeur(int depart,struct Graphe g)
+{
 	int i=0;
 	int j=0;
 	int k=0;
@@ -364,13 +390,13 @@ void RechercheVoisinsProfondeur(int depart,struct Matrice m){
 	int fin;
 	sommetsvisites[compteurVisite]=depart;
 	compteurVisite++;
-	
-	
+
+
 	printf("depart : %d \n",depart);
-	for(i=0;i<m.tailleY;i++)
+	for(i=0;i<g.tailleY;i++)
 	{
 		// si depart a un voisin
-		if(m.matAdj[depart][i]!=0)
+		if(g.matAdj[depart][i]!=0)
 		{
 			compteurSucesseurs++;
 		}
@@ -384,14 +410,14 @@ void RechercheVoisinsProfondeur(int depart,struct Matrice m){
 		return;
 	}
 	compteurSucesseurs=0;
-	
+
 	//parcours voisins de depart
-	for(i=0;i<m.tailleY;i++)
+	for(i=0;i<g.tailleY;i++)
 	{
 		printf("parcours de voisin \n");
 		// si depart a un voisin
 		printf("recherche en [%d][%d] \n",depart,i);
-		if(m.matAdj[depart][i]!=0)
+		if(g.matAdj[depart][i]!=0)
 		{
 			printf("voisin trouvé en : %d \n",i);
 			for(j=0;j<50;j++){
@@ -415,7 +441,7 @@ void RechercheVoisinsProfondeur(int depart,struct Matrice m){
 				return;
 			   	}
 				flag=0;
-				
+
 		}
 
 	}
@@ -426,10 +452,7 @@ void RechercheVoisinsProfondeur(int depart,struct Matrice m){
 
 }
 
-
-
-
-void parcoursProfondeur(struct Matrice m)
+void parcoursProfondeur(struct Graphe g)
 {
 	maPile= initialiserP();
 	empiler(maPile,0);
@@ -442,7 +465,7 @@ void parcoursProfondeur(struct Matrice m)
 
 	while(estVideP(maPile)!=0){
 		//printf("premier element de la pile : %d \n",getPremierElementP(maPile));
-		RechercheVoisinsProfondeur(getPremierElementP(maPile),m);
+		RechercheVoisinsProfondeur(getPremierElementP(maPile),g);
 		/*
 		printf("Pile : \n");
 		printf("___debut ___\n");
@@ -461,107 +484,86 @@ void parcoursProfondeur(struct Matrice m)
 		printf("%d->",sommetsMarques[j]);
 		j++;
 	}
-	
+
 	printf("\n");
 }
 
+void menu(struct Graphe g1)
+{
+    char nomGraphe[100];
+    int type1;
+    int type2;
+    int choix;
+    char choix2;
 
+    printf("importer un graphe existant ou en creer un nouveau ?\n");
+    printf("	1)importer\n");
+    printf("	2)nouveau graphe\n");
+    scanf("%d",&choix);
 
+    switch (choix)
+    {
+    case 1:
+        printf("nom du graphe à importer :\n");
+        scanf("%s",nomGraphe);
+        strcat(nomGraphe,".txt");
+        g1 = getMatrice(nomGraphe);
+        afficherMatrice(g1);
+     break;
+    case 2:
+        printf("type à écrire ?\n");
+        printf("	1)matrice Incidente\n");
+        printf("	2)matrice Adjacente\n");
+        scanf("%d",&type2);
+        switch (type2)
+        {
+            case 1:
+            g1=setGraphe(1);
+            //printf(" x: %d, y: %d, inc: %d \n",g1.tailleX,g1.tailleY,g1.tailleInc);
+            IncToAdj(&g1);
+            break;
+            case 2:
+            g1=setGraphe(2);
+            AdjToInc(&g1);
+            break;
+            default:
+             printf("Erreur de saisie");
+            break;
+        }
+        afficherMatrice(g1);
+
+        printf("sauvegarder graphe ? y/n\n");
+        scanf(" %c",&choix2);
+        switch (choix2)
+        {
+            case 'y':
+            saveGraphe(g1);
+            break;
+            case 'n':
+            break;
+            default:
+             printf("Erreur de saisie");
+            break;
+        }
+
+      break;
+    default:
+      printf("Erreur de saisie");
+    break;
+    }
+}
 
 int main()
 {
-struct Matrice m1;
+    struct Graphe g1;
 
-/*
-char nomGraphe[100];
-int type1;
-int type2;
-int choix;
-char choix2;
+    //g1=setGraphe(ADJACENCE);
+    g1=getMatrice("matrice.txt");
+    //AdjToInc(&g1);
+    afficherMatrice(g1);
 
-printf("importer un graphe existant ou en creer un nouveau ?\n");
-printf("	1)importer\n");
-printf("	2)nouveau graphe\n");
-scanf("%d",&choix);
-
-switch (choix)
-{
-case 1:
-	printf("nom du graphe à importer :\n");
-	scanf("%s",nomGraphe);
-	strcat(nomGraphe,".txt");
-
-	printf("quel type de matrice ?\n");
-	printf("	1)matrice Incidente\n");
-	printf("	2)matrice Adjacente\n");
-	scanf("%d",&type1);
-
-	switch (type1)
-	{
-	case 1:
-	  m1 =getMatriceInc(nomGraphe);
-	  break;
-	case 2:
-	  m1 =getMatriceAdj(nomGraphe);
-	  break;
-	default:
-	  printf("Erreur de saisie");
-	break;
-	}
-
-	afficherMatrice(m1);
- break;
-case 2:
-
-	printf("type à écrire ?\n");
-	printf("	1)matrice Incidente\n");
-	printf("	2)matrice Adjacente\n");
-	scanf("%d",&type2);
-	switch (type2)
-	{
-		case 1:
-		m1=setGraphe(1);
-		//printf(" x: %d, y: %d, inc: %d \n",m1.tailleX,m1.tailleY,m1.tailleInc);
-		IncToAdj(&m1);
-		break;
-		case 2:
-		m1=setGraphe(2);
-		AdjToInc(&m1);
-		break;
-		default:
-		 printf("Erreur de saisie");
-		break;
-	}
-	afficherMatrice(m1);
-
-	printf("sauvegarder graphe ? y/n\n");
-	scanf(" %c",&choix2);
-	switch (choix2)
-	{
-		case 'y':
-		saveGraphe(m1);
-		break;
-		case 'n':
-		break;
-		default:
-		 printf("Erreur de saisie");
-		break;
-	}
-
-  break;
-default:
-  printf("Erreur de saisie");
-break;
-}
-
-*/
-
-m1=getMatriceAdj("matrice.txt");
-//afficherMatrice(m1);
-
-//parcoursLargeur(m1);
-
-parcoursProfondeur(m1);
-
-return 0;
+    g1=getMatrice("matriceIncidence.txt");
+    //IncToAdj(&g1);
+    afficherMatrice(g1);
+    return 0;
 }

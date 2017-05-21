@@ -1,3 +1,6 @@
+#ifndef FONCTIONS_H
+#define FONCTIONS_H
+
 struct Graphe
 {
 	int tailleX;
@@ -137,6 +140,4 @@ void menu(struct Graphe g1);
 
 void afficherPrecedent(int precedent[2][10], int c);
 
-
-
-
+#endif

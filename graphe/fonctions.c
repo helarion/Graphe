@@ -10,16 +10,9 @@
 #include <unistd.h>
 #include <stdlib.h>
 
-struct Graphe
-{
-	int tailleX;
-	int tailleY;
+#include "fonctions.h"
 
-	int tailleInc;
 
-	int matAdj[100][100]; // valeurs
-	int matInc[100][100]; // booleene
-};
 
 int TabFile[50];
 File *maFile;
@@ -633,7 +626,7 @@ void chercherDijkstra(int graphe[100][100], int poids[3][100], int precedent[2][
 				}
 			}
 		}
-		_sleep(1000);
+		_sleep(500);
 	}
 	while(id!=arrivee); // tant que le poids parcouru le plus faible n'est pas l'arrivee, on cherche
 }
@@ -805,6 +798,9 @@ void menu(struct Graphe g1)
     case 1:
         printf("nom du graphe à importer :\n");
         scanf("%s",nomGraphe);
+        char fichier[100]="graphes/";
+        strcat(fichier,nomGraphe);
+        strcpy(nomGraphe,fichier);
         strcat(nomGraphe,".txt");
         g1 = getMatrice(nomGraphe);
         afficherMatrice(g1);
@@ -851,32 +847,5 @@ void menu(struct Graphe g1)
     break;
     }
 }
-
-// affichage du tableau des antécédents
-
-void afficherPrecedent(int precedent[2][10], int c)
-{
-    int i;
-	printf("\nTable des antécédents:\n");
-	for(i=0; i<c; i++)
-	{
-		char car1='A';
-		char car2='A';
-		car1+=precedent[0][i];
-		car2+=precedent[1][i];
-		if(car2!='@')	printf("%c a pour antécédent: %c\n",car1,car2);
-		else printf("%c n'a aucun antécédent\n",car1);
-	}
-    struct Graphe g1;
-    g1=getMatrice("matrice5.txt");
-    //IncToAdj(&g1);
-    //afficherMatrice(g1);
-    parcoursProfondeur(g1);
-    //parcoursLargeur(g1);
-    //Kruskal(g1);
-    return 0;
-}
-
-
 
 

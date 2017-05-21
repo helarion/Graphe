@@ -19,6 +19,8 @@ int sommetsvisites[50];
 int compteurMarque=0;
 int compteurVisite=0;
 
+int TabFile[50];
+
 struct Graphe
 {
 	int tailleX;
@@ -36,8 +38,6 @@ void AdjToInc(struct Graphe *g){
 
     tailleX=g->tailleX;
     tailleY=g->tailleY;
-
-    printf("x:%d y:%d\n",tailleX, tailleY);
 
     for(i=0;i<tailleX;i++)
     {
@@ -328,26 +328,51 @@ void RechercheVoisins(int depart,struct Graphe g){
 
 	int flag=0;
 
+	printf("tableau file :\n");
+	StockerFile(maFile,TabFile);
+	for(i=0;i<10;i++){
+
+		printf("%d-",TabFile[i]);
+
+	}
+		printf("\n");
+	printf("SommetsPasses :\n");
+	for(i=0;i<10;i++){
+		printf("%d-",SommetsPasses[i]);
+
+	}
+	printf("\n");
+	printf("============\n");
+
 	for(i=0;i<g.tailleY;i++)
 	{
 		if(g.matAdj[depart][i]!=0)
 			{
-				//printf("%d est voisin avec %d \n",depart,i);
-				for(j=0;j<50;j++){
+				printf("%d est voisin avec %d \n",depart,i);
+				for(j=0;j<10;j++){
 					if(i==SommetsPasses[j]){
-						//printf("%d est deja passé \n", i);
+						printf("%d est deja passé \n", i);
 						flag=1;
 						break;
+					}else if(i==TabFile[j]){
+					printf("%d est deja dans la file \n", i);
+					flag=1;
+					break;
 					}
 				}
 				if(flag!=1){
+						printf("ajout de : %d à la file \n",i);
 						enfiler(maFile,i);
-						//printf("ajout de : %d en sommet passé \n",depart);
+						printf("ajout de : %d en sommet passé \n",depart);
 						SommetsPasses[compteurSommetsPasses]=depart;
 
 					}
+				printf("ajout de : %d en sommet passé \n",depart);
+				SommetsPasses[compteurSommetsPasses]=depart;
 				j=0;
 				flag=0;
+
+
 			}
 	}
 	compteurSommetsPasses++;
@@ -373,7 +398,9 @@ void parcoursLargeur(struct Graphe g)
 		parcours[compteur]=getPremierElement(maFile);
 		compteur++;
 		defiler(maFile);
-		//afficherFile(maFile);
+		/*printf("affichage file :\n");
+		afficherFile(maFile);
+		printf("================\n");*/
 	}
 
 	for(i=0;i<g.tailleX;i++){
@@ -496,6 +523,82 @@ void parcoursProfondeur(struct Graphe g)
 	printf("\n");
 }
 
+void Kruskal(struct Graphe g1){
+
+	// 3 : départ, arrivée, valeur;
+	//50 : arbitraire <=> nombre d'acr possible
+
+	int listeArc [50][3];
+	int i,j;
+	int c=0;
+	
+	/*
+	printf("données : \n");
+    printf("g.TailleX :%d \n",g1.tailleX);
+    printf("g.TailleY :%d \n",g1.tailleY);
+    printf("g.tailleInc :%d\n",g1.tailleInc);
+    */
+
+	for(i=0;i<g1.tailleInc;i++)
+    {
+        for(j=0;j<g1.tailleX;j++)
+        {
+        	if(g1.matInc[j][i]==1){
+        		listeArc[i][c]=j;
+        		c++;
+        	}
+        }
+        c=0;
+        listeArc[i][2]=g1.matInc[g1.tailleX][i];
+    }
+
+
+
+
+
+	int enOordre = 0;
+    int tailleListe = g1.tailleInc;
+    int temp;
+    while(enOordre==0)
+    {
+        enOordre = 1;
+        for(i=0 ; i < tailleListe-1 ; i++)
+        {
+            if(listeArc[i][2] > listeArc[i+1][2])
+            {
+            	temp=listeArc[i][2];
+            	listeArc[i][2]=listeArc[i+1][2];
+            	listeArc[i+1][2]=temp;
+
+
+                temp=listeArc[i][1];
+            	listeArc[i][1]=listeArc[i+1][1];
+            	listeArc[i+1][1]=temp;
+
+                temp=listeArc[i][0];
+            	listeArc[i][0]=listeArc[i+1][0];
+            	listeArc[i+1][0]=temp;
+
+                enOordre = 0;
+            }
+        }
+        tailleListe--;
+    }
+    
+    	for(i=0;i<g1.tailleInc;i++)
+    {
+        	printf("départ : %d, arrivée: %d, valeur: %d \n",listeArc[i][0],listeArc[i][1],listeArc[i][2]);
+    }
+
+
+
+
+
+
+
+}
+
+
 void menu(struct Graphe g1)
 {
     char nomGraphe[100];
@@ -564,8 +667,11 @@ void menu(struct Graphe g1)
 int main()
 {
     struct Graphe g1;
-    g1=getMatrice("matriceIncidence.txt");
+    g1=getMatrice("matrice5.txt");
     //IncToAdj(&g1);
-    afficherMatrice(g1);
+    //afficherMatrice(g1);
+    //parcoursProfondeur(g1);
+    parcoursLargeur(g1);
+    //Kruskal(g1);
     return 0;
 }

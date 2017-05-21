@@ -457,13 +457,13 @@ void RechercheVoisinsProfondeur(int depart,struct Graphe g)
 			printf("voisin trouvé en : %d \n",i);
 			for(j=0;j<50;j++){
 				// si ce voisin est marqué
-				printf("j: %d",j);
+				///printf("j: %d",j);
 				if(i==sommetsMarques[j]){
 					printf("voisin déjà marqué, next :\n");
 					flag=1;
 					break;
 				}
-				if(i==sommetsvisites[i]){
+				if(i==sommetsvisites[j]){
 					printf("voisin déjà visité, next :\n");
 					flag=1;
 					break;
@@ -506,10 +506,11 @@ void parcoursProfondeur(struct Graphe g)
 		printf("___debut ___\n");
 		afficherPile(maPile);
 		printf("___fin ___\n");
+		*/
 		printf("sommets marqués :  sommets visités :\n");
 		for(j=0;j<7;j++){
 			printf("%d                  %d\n",sommetsMarques[j],sommetsvisites[j]);
-		}*/
+		}
 
 	}
 
@@ -525,6 +526,8 @@ void parcoursProfondeur(struct Graphe g)
 
 void Kruskal(struct Graphe g1){
 
+	
+
 	// 3 : départ, arrivée, valeur;
 	//50 : arbitraire <=> nombre d'acr possible
 
@@ -532,12 +535,12 @@ void Kruskal(struct Graphe g1){
 	int i,j;
 	int c=0;
 	
-	/*
+	
 	printf("données : \n");
     printf("g.TailleX :%d \n",g1.tailleX);
     printf("g.TailleY :%d \n",g1.tailleY);
     printf("g.tailleInc :%d\n",g1.tailleInc);
-    */
+    
 
 	for(i=0;i<g1.tailleInc;i++)
     {
@@ -550,6 +553,9 @@ void Kruskal(struct Graphe g1){
         }
         c=0;
         listeArc[i][2]=g1.matInc[g1.tailleX][i];
+
+
+
     }
 
 
@@ -670,8 +676,8 @@ int main()
     g1=getMatrice("matrice5.txt");
     //IncToAdj(&g1);
     //afficherMatrice(g1);
-    //parcoursProfondeur(g1);
-    parcoursLargeur(g1);
+    parcoursProfondeur(g1);
+    //parcoursLargeur(g1);
     //Kruskal(g1);
     return 0;
 }

@@ -1,23 +1,13 @@
-#include <stdio.h>
-#include <string.h>
 #include "file.h"
-#include "file.c"
 #include "pile.h"
-#include "pile.c"
 
 #define ADJACENCE 1
 #define INCIDENCE 2
 #define TAILLE_MAX 1000
 
-File *maFile;
-Pile *maPile;
-int compteurSommetsPasses=0;
-int SommetsPasses[50];
-
-int sommetsMarques[50];
-int sommetsvisites[50];
-int compteurMarque=0;
-int compteurVisite=0;
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
 
 struct Graphe
 {
@@ -30,7 +20,18 @@ struct Graphe
 	int matInc[100][100]; // booleene
 };
 
-void AdjToInc(struct Graphe *g){
+File *maFile;
+Pile *maPile;
+int compteurSommetsPasses;
+int SommetsPasses[50];
+
+int sommetsMarques[50];
+int sommetsvisites[50];
+int compteurMarque;
+int compteurVisite;
+
+static void AdjToInc(struct Graphe *g)
+{
 	int i,j,tailleX,tailleY;
 	int c=0;
 
@@ -66,18 +67,18 @@ void AdjToInc(struct Graphe *g){
     }
 }
 
-void IncToAdj(struct Graphe *g){
-    int i,j,tailleX,tailleY;
+void IncToAdj(struct Graphe *g)
+{
+    int i,j;
     int poids;
 
     g->tailleY=g->tailleX;
 
 
-    printf("donnÃ©es : \n");
+    /*printf("données : \n");
     printf("g.TailleX :%d \n",g->tailleX);
     printf("g.TailleY :%d \n",g->tailleY);
-    printf("g.tailleInc :%d\n",g->tailleInc);
-
+    printf("g.tailleInc :%d\n",g->tailleInc);*/
 
 
     for(i=0;i<g->tailleInc;i++)
@@ -102,11 +103,9 @@ void afficherMatrice(struct Graphe g)
     int i;
     int j;
 
-    int compteur=0;
-
     printf("x: %d,y: %d, inc: %d \n",g.tailleX,g.tailleY,g.tailleInc);
 
-    printf("donnÃ©es affichage : \n");
+    printf("données affichage : \n");
 	printf("g.TailleX :%d \n",g.tailleX);
 	printf("g.TailleY :%d \n",g.tailleY);
 	printf("g.tailleInc :%d\n",g.tailleInc);
@@ -150,7 +149,7 @@ struct Graphe getMatrice(char* nomFichier)
 
 	if (fp == NULL) {
 	  fprintf(stderr, "Impossible d'ouvrir le fichier!\n");
-	  return;
+	  return ;
 	}
 
 	struct Graphe g;
@@ -201,45 +200,6 @@ struct Graphe getMatrice(char* nomFichier)
 	return g;
 }
 
-struct Graphe getMatriceInc(char* nomFichier)
-{
-	FILE *fp;
-	fp = fopen(nomFichier, "r");
-
-	if (fp == NULL) {
-	  fprintf(stderr, "Impossible d'ouvrir le fichier!\n");
-	  return;
-	}
-
-	struct Graphe g;
-    int c;
-    int compteur=0;
-
-    int i=0;
-    int j=0;
-
-    fscanf(fp,"%d",&c);
-    g.tailleInc=c;
-    fscanf(fp,"%d",&c);
-    g.tailleX=c-1;
-
-    for(i=0;i<g.tailleX+1;i++)
-    {
-        for(j=0;j<g.tailleInc;j++)
-        {
-            fscanf(fp,"%d",&c);
-            //printf("c:%d \n",c);
-            g.matInc[i][j]=c;
-        }
-    }
-
-    fclose(fp);
-
-    IncToAdj(&g);
-
-	return g;
-}
-
 void saveGraphe(struct Graphe g)
 {
     FILE *f;
@@ -258,7 +218,7 @@ void saveGraphe(struct Graphe g)
     {
         freopen(chemin, "w", f);
     }
-    char* write;
+    char* write="";
     sprintf(write, "%d", g.tailleX);
     fprintf(f,"%s",write);
     fprintf(f," ");
@@ -321,7 +281,8 @@ struct Graphe setGraphe(int type)
     return g;
 }
 
-void RechercheVoisins(int depart,struct Graphe g){
+void RechercheVoisins(int depart,struct Graphe g)
+{
 
 	int i=0;
 	int j=0;
@@ -335,14 +296,14 @@ void RechercheVoisins(int depart,struct Graphe g){
 				//printf("%d est voisin avec %d \n",depart,i);
 				for(j=0;j<50;j++){
 					if(i==SommetsPasses[j]){
-						//printf("%d est deja passÃ© \n", i);
+						//printf("%d est deja passé \n", i);
 						flag=1;
 						break;
 					}
 				}
 				if(flag!=1){
 						enfiler(maFile,i);
-						//printf("ajout de : %d en sommet passÃ© \n",depart);
+						//printf("ajout de : %d en sommet passé \n",depart);
 						SommetsPasses[compteurSommetsPasses]=depart;
 
 					}
@@ -359,13 +320,10 @@ void parcoursLargeur(struct Graphe g)
 
 	maFile =initialiser();
 	int i=0;
-	int j=0;
 	int parcours[50];
 
 	int compteur=0;
 	enfiler(maFile,0);
-	int flag=0;
-
 
 	while(estVide(maFile)!=0){
 
@@ -391,11 +349,8 @@ void RechercheVoisinsProfondeur(int depart,struct Graphe g)
 {
 	int i=0;
 	int j=0;
-	int k=0;
 	int flag=0;
-	int flag2=0;
 	int compteurSucesseurs=0;
-	int fin;
 	sommetsvisites[compteurVisite]=depart;
 	compteurVisite++;
 
@@ -427,24 +382,24 @@ void RechercheVoisinsProfondeur(int depart,struct Graphe g)
 		printf("recherche en [%d][%d] \n",depart,i);
 		if(g.matAdj[depart][i]!=0)
 		{
-			printf("voisin trouvÃ© en : %d \n",i);
+			printf("voisin trouvé en : %d \n",i);
 			for(j=0;j<50;j++){
-				// si ce voisin est marquÃ©
+				// si ce voisin est marqué
 				printf("j: %d",j);
 				if(i==sommetsMarques[j]){
-					printf("voisin dÃ©jÃ  marquÃ©, next :\n");
+					printf("voisin déjà marqué, next :\n");
 					flag=1;
 					break;
 				}
 				if(i==sommetsvisites[i]){
-					printf("voisin dÃ©jÃ  visitÃ©, next :\n");
+					printf("voisin déjà visité, next :\n");
 					flag=1;
 					break;
 				}
 			}
-			// si voisin non marquÃ©
+			// si voisin non marqué
 				if(flag!=1){
-				printf("voisin non marquÃ© ni visitÃ©, ajout Ã  la pile \n");
+				printf("voisin non marqué ni visité, ajout à la pile \n");
 				empiler(maPile,i);
 				return;
 			   	}
@@ -453,7 +408,7 @@ void RechercheVoisinsProfondeur(int depart,struct Graphe g)
 		}
 
 	}
-	printf("Aucun voisin non marquÃ© ou non visitÃ© : marquage \n");
+	printf("Aucun voisin non marqué ou non visité : marquage \n");
 	depiler(maPile);
 	sommetsMarques[compteurMarque]=depart;
 	compteurMarque++;
@@ -479,7 +434,7 @@ void parcoursProfondeur(struct Graphe g)
 		printf("___debut ___\n");
 		afficherPile(maPile);
 		printf("___fin ___\n");
-		printf("sommets marquÃ©s :  sommets visitÃ©s :\n");
+		printf("sommets marqués :  sommets visités :\n");
 		for(j=0;j<7;j++){
 			printf("%d                  %d\n",sommetsMarques[j],sommetsvisites[j]);
 		}*/
@@ -496,10 +451,151 @@ void parcoursProfondeur(struct Graphe g)
 	printf("\n");
 }
 
+//affichage du tableau des poids
+
+void afficherPoids(int poids[3][100], int c)
+{
+    int i;
+	printf("\nTable des poids:\n");
+	for(i=0; i<c; i++)
+	{
+		char car='A';
+		car+=poids[0][i];
+		printf("%c: poids=%d ",car,poids[1][i] );
+		if(poids[2][i]==1) printf("scanné");
+		else printf("non scanné");
+		printf("; \n");
+	}
+}
+
+void dijkstra(struct Graphe g)
+{
+    int poids[3][100];
+    int precedent[2][100];
+    int depart=0;
+    int arrivee=4;
+    int taille=g.tailleX;
+    //afficherPoids(poids,taille);
+    debut(poids,precedent,depart,taille);
+    //afficherPoids(poids,taille);
+    chercherDijkstra(g.matAdj,poids,precedent,depart,arrivee,taille);
+    int liste[10];
+    int compt=fin(precedent,arrivee,depart,taille,liste);
+    char car1;
+    char car2;
+    car1='A';
+    car1+=depart;
+    car2='A';
+    car2+=arrivee;
+    if(poids[1][arrivee]!=0)
+    {
+        printf("Pour aller de %c vers %c",car1, car2);
+        printf(" il faut emprunter les noeuds suivants:\n");
+        int i;
+        for(i=compt-1; i>=0; i--)
+        {
+            car1='A';
+            car1+=liste[i];
+            printf("%c",car1);
+            if(car1!=car2) printf(" vers ");
+        }
+        printf(" pour un poids total de %d",poids[1][arrivee]);
+    }
+    else
+    {
+        printf("Aucun chemin de %c à %c \n",car1,car2);
+    }
+}
+
+// initialisation des tableaux de poids et d'antécédents
+
+void debut(int poids[100][100] , int precedent[][100] , int depart, int c)
+{
+    int i;
+	for(i=0; i<c;i++)
+		{
+		    afficherPoids(poids,c);
+			poids[0][i]=i;
+			poids[1][i]=-1;
+			poids[2][i]=0;
+			precedent[0][i]=i;
+			precedent[1][i]=-1;
+		}
+	poids[1][depart]=0; // puisque c'est le point de départ : sa distance à lui même est de 0
+}
+
+// stocke le chemin le plus court déterminé précédement et renvoi le nombre de routeurs empruntés
+
+int fin(int precedent[2][100], int arrivee, int depart, int c, int liste[100])
+{
+	int actuel=arrivee;
+	liste[0]=actuel;
+	int compt=1;
+	while(actuel != depart)
+	{
+	    int i;
+		for(i=0; i<c; i++)
+		{
+			if(precedent[0][i]==actuel)
+			{
+				actuel=precedent[1][i];
+				liste[compt]=actuel;
+				compt++;
+				break;
+			}
+		}
+	}
+	return compt;
+}
+
+// scan du graphe pour trouver le chemin le plus court
+void chercherDijkstra(int graphe[100][100], int poids[3][100], int precedent[2][100], int depart, int arrivee, int c)
+{
+	int id;//=depart;
+	int i;
+	do
+	{
+		int min=100;
+		afficherPoids(poids,c);
+		for(i=0;i<c;i++)
+		{
+		    int p=poids[1][i];
+		    //printf("poids:%d\n",p);
+			if(p<min && p!=-1 && poids[2][i]==0)
+			{
+				min=poids[1][i];
+				id=i;
+				printf("i=%d id:%d\n",i,id);
+			}
+		}
+		if(id!=arrivee) // si on a pas atteint l'arrivee
+		{
+		    printf("rentre\n");
+            printf("id:%d\n",id);
+			poids[2][id]=1; // marque
+			int i;
+			for(i=0;i<c;i++)
+			{
+				if(graphe[i][id]!=0 && poids[2][i]==0) // si le noeud-fils n'a pas encore été parcouru
+				{
+				    // si Poids(Noeud-père) + Poids(Liaison Noeud-père/Noeud-fils) < Poids(Noeud-fils)
+                    // OU Poids(Noeud-fils) = -1
+					if((poids[1][id]+graphe[i][id])<poids[1][i] || poids[1][i]==-1)
+					{
+						poids[1][i]=(poids[1][id]+graphe[i][id]);
+						precedent[1][i]=id;
+					}
+				}
+			}
+		}
+		_sleep(1000);
+	}
+	while(id!=arrivee); // tant que le poids parcouru le plus faible n'est pas l'arrivee, on cherche
+}
+
 void menu(struct Graphe g1)
 {
     char nomGraphe[100];
-    int type1;
     int type2;
     int choix;
     char choix2;
@@ -512,14 +608,14 @@ void menu(struct Graphe g1)
     switch (choix)
     {
     case 1:
-        printf("nom du graphe Ã  importer :\n");
+        printf("nom du graphe à importer :\n");
         scanf("%s",nomGraphe);
         strcat(nomGraphe,".txt");
         g1 = getMatrice(nomGraphe);
         afficherMatrice(g1);
      break;
     case 2:
-        printf("type Ã  Ã©crire ?\n");
+        printf("type à écrire ?\n");
         printf("	1)matrice Incidente\n");
         printf("	2)matrice Adjacente\n");
         scanf("%d",&type2);
@@ -561,11 +657,23 @@ void menu(struct Graphe g1)
     }
 }
 
-int main()
+// affichage du tableau des antécédents
+
+void afficherPrecedent(int precedent[2][10], int c)
 {
-    struct Graphe g1;
-    g1=getMatrice("matriceIncidence.txt");
-    //IncToAdj(&g1);
-    afficherMatrice(g1);
-    return 0;
+    int i;
+	printf("\nTable des antécédents:\n");
+	for(i=0; i<c; i++)
+	{
+		char car1='A';
+		char car2='A';
+		car1+=precedent[0][i];
+		car2+=precedent[1][i];
+		if(car2!='@')	printf("%c a pour antécédent: %c\n",car1,car2);
+		else printf("%c n'a aucun antécédent\n",car1);
+	}
 }
+
+
+
+

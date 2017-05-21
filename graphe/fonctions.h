@@ -9,6 +9,8 @@
 #include <string.h>
 #include <unistd.h>
 
+int TabFile[50];
+
 struct Graphe
 {
 	int tailleX;
@@ -37,8 +39,6 @@ static void AdjToInc(struct Graphe *g)
 
     tailleX=g->tailleX;
     tailleY=g->tailleY;
-
-    printf("x:%d y:%d\n",tailleX, tailleY);
 
     for(i=0;i<tailleX;i++)
     {
@@ -289,26 +289,51 @@ void RechercheVoisins(int depart,struct Graphe g)
 
 	int flag=0;
 
+	printf("tableau file :\n");
+	StockerFile(maFile,TabFile);
+	for(i=0;i<10;i++){
+
+		printf("%d-",TabFile[i]);
+
+	}
+		printf("\n");
+	printf("SommetsPasses :\n");
+	for(i=0;i<10;i++){
+		printf("%d-",SommetsPasses[i]);
+
+	}
+	printf("\n");
+	printf("============\n");
+
 	for(i=0;i<g.tailleY;i++)
 	{
 		if(g.matAdj[depart][i]!=0)
 			{
-				//printf("%d est voisin avec %d \n",depart,i);
-				for(j=0;j<50;j++){
+				printf("%d est voisin avec %d \n",depart,i);
+				for(j=0;j<10;j++){
 					if(i==SommetsPasses[j]){
-						//printf("%d est deja passÈ \n", i);
+						printf("%d est deja pass√© \n", i);
 						flag=1;
 						break;
+					}else if(i==TabFile[j]){
+					printf("%d est deja dans la file \n", i);
+					flag=1;
+					break;
 					}
 				}
 				if(flag!=1){
+						printf("ajout de : %d √† la file \n",i);
 						enfiler(maFile,i);
-						//printf("ajout de : %d en sommet passÈ \n",depart);
+						printf("ajout de : %d en sommet pass√© \n",depart);
 						SommetsPasses[compteurSommetsPasses]=depart;
 
 					}
+				printf("ajout de : %d en sommet pass√© \n",depart);
+				SommetsPasses[compteurSommetsPasses]=depart;
 				j=0;
 				flag=0;
+
+
 			}
 	}
 	compteurSommetsPasses++;
@@ -331,7 +356,9 @@ void parcoursLargeur(struct Graphe g)
 		parcours[compteur]=getPremierElement(maFile);
 		compteur++;
 		defiler(maFile);
-		//afficherFile(maFile);
+		/*printf("affichage file :\n");
+		afficherFile(maFile);
+		printf("================\n");*/
 	}
 
 	for(i=0;i<g.tailleX;i++){
@@ -391,8 +418,9 @@ void RechercheVoisinsProfondeur(int depart,struct Graphe g)
 					flag=1;
 					break;
 				}
-				if(i==sommetsvisites[i]){
-					printf("voisin dÈj‡ visitÈ, next :\n");
+
+				if(i==sommetsvisites[j]){
+					printf("voisin d√©j√† visit√©, next :\n");
 					flag=1;
 					break;
 				}
@@ -427,17 +455,11 @@ void parcoursProfondeur(struct Graphe g)
 	}
 
 	while(estVideP(maPile)!=0){
-		//printf("premier element de la pile : %d \n",getPremierElementP(maPile));
 		RechercheVoisinsProfondeur(getPremierElementP(maPile),g);
-		/*
-		printf("Pile : \n");
-		printf("___debut ___\n");
-		afficherPile(maPile);
-		printf("___fin ___\n");
-		printf("sommets marquÈs :  sommets visitÈs :\n");
+		printf("sommets marqu√©s :  sommets visit√©s :\n");
 		for(j=0;j<7;j++){
 			printf("%d                  %d\n",sommetsMarques[j],sommetsvisites[j]);
-		}*/
+		}
 
 	}
 
@@ -462,8 +484,8 @@ void afficherPoids(int poids[3][100], int c)
 		char car='A';
 		car+=poids[0][i];
 		printf("%c: poids=%d ",car,poids[1][i] );
-		if(poids[2][i]==1) printf("scannÈ");
-		else printf("non scannÈ");
+		if(poids[2][i]==1) printf("scanne");
+		else printf("non scanne");
 		printf("; \n");
 	}
 }
@@ -565,13 +587,10 @@ void chercherDijkstra(int graphe[100][100], int poids[3][100], int precedent[2][
 			{
 				min=poids[1][i];
 				id=i;
-				printf("i=%d id:%d\n",i,id);
 			}
 		}
 		if(id!=arrivee) // si on a pas atteint l'arrivee
 		{
-		    printf("rentre\n");
-            printf("id:%d\n",id);
 			poids[2][id]=1; // marque
 			int i;
 			for(i=0;i<c;i++)
@@ -591,6 +610,79 @@ void chercherDijkstra(int graphe[100][100], int poids[3][100], int precedent[2][
 		_sleep(1000);
 	}
 	while(id!=arrivee); // tant que le poids parcouru le plus faible n'est pas l'arrivee, on cherche
+}
+
+void Kruskal(struct Graphe g1){
+
+
+
+	// 3 : d√©part, arriv√©e, valeur;
+	//50 : arbitraire <=> nombre d'acr possible
+
+	int listeArc [50][3];
+	int i,j;
+	int c=0;
+
+
+	printf("donn√©es : \n");
+    printf("g.TailleX :%d \n",g1.tailleX);
+    printf("g.TailleY :%d \n",g1.tailleY);
+    printf("g.tailleInc :%d\n",g1.tailleInc);
+
+
+	for(i=0;i<g1.tailleInc;i++)
+    {
+        for(j=0;j<g1.tailleX;j++)
+        {
+        	if(g1.matInc[j][i]==1){
+        		listeArc[i][c]=j;
+        		c++;
+        	}
+        }
+        c=0;
+        listeArc[i][2]=g1.matInc[g1.tailleX][i];
+    }
+
+	int enOordre = 0;
+    int tailleListe = g1.tailleInc;
+    int temp;
+    while(enOordre==0)
+    {
+        enOordre = 1;
+        for(i=0 ; i < tailleListe-1 ; i++)
+        {
+            if(listeArc[i][2] > listeArc[i+1][2])
+            {
+            	temp=listeArc[i][2];
+            	listeArc[i][2]=listeArc[i+1][2];
+            	listeArc[i+1][2]=temp;
+
+
+                temp=listeArc[i][1];
+            	listeArc[i][1]=listeArc[i+1][1];
+            	listeArc[i+1][1]=temp;
+
+                temp=listeArc[i][0];
+            	listeArc[i][0]=listeArc[i+1][0];
+            	listeArc[i+1][0]=temp;
+
+                enOordre = 0;
+            }
+        }
+        tailleListe--;
+    }
+
+    	for(i=0;i<g1.tailleInc;i++)
+    {
+        	printf("d√©part : %d, arriv√©e: %d, valeur: %d \n",listeArc[i][0],listeArc[i][1],listeArc[i][2]);
+    }
+
+
+
+
+
+
+
 }
 
 void menu(struct Graphe g1)
@@ -672,6 +764,14 @@ void afficherPrecedent(int precedent[2][10], int c)
 		if(car2!='@')	printf("%c a pour antÈcÈdent: %c\n",car1,car2);
 		else printf("%c n'a aucun antÈcÈdent\n",car1);
 	}
+    struct Graphe g1;
+    g1=getMatrice("matrice5.txt");
+    //IncToAdj(&g1);
+    //afficherMatrice(g1);
+    parcoursProfondeur(g1);
+    //parcoursLargeur(g1);
+    //Kruskal(g1);
+    return 0;
 }
 
 

@@ -63,6 +63,7 @@ int defiler(File *file)
 
 void afficherFile(File *file)
 {
+
     if (file == NULL)
     {
         exit(EXIT_FAILURE);
@@ -73,6 +74,27 @@ void afficherFile(File *file)
     while (element != NULL)
     {
         printf("%d ", element->nombre);
+        element = element->suivant;
+    }
+
+    printf("\n");
+}
+
+void StockerFile(File *file,int TabFile[50])
+{
+  int compteur=0;
+
+    if (file == NULL)
+    {
+        exit(EXIT_FAILURE);
+    }
+
+    Element *element = file->premier;
+
+    while (element != NULL)
+    {
+        TabFile[compteur]=element->nombre;
+        compteur++;
         element = element->suivant;
     }
 

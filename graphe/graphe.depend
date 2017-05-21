@@ -1,5 +1,11 @@
 # depslib dependency file v1.0
-1495409383 source:c:\users\axel\documents\github\graphe\graphe\fonctions.c
+1495413078 source:c:\users\axel\documents\github\graphe\graphe\fonctions.c
+	"file.h"
+	"pile.h"
+	<stdio.h>
+	<string.h>
+	<unistd.h>
+	<stdlib.h>
 
 1495409385 source:c:\users\axel\documents\github\graphe\graphe\file.c
 	<stdio.h>
@@ -15,15 +21,16 @@
 
 1495409383 c:\users\axel\documents\github\graphe\graphe\pile.h
 
-1495409383 source:c:\users\axel\documents\github\graphe\graphe\main.c
+1495412366 source:c:\users\axel\documents\github\graphe\graphe\main.c
 	<stdio.h>
 	<string.h>
 	"fonctions.h"
 
-1495409701 c:\users\axel\documents\github\graphe\graphe\fonctions.h
+1495412516 c:\users\axel\documents\github\graphe\graphe\fonctions.h
 	"file.h"
 	"pile.h"
 	<stdio.h>
 	<string.h>
 	<unistd.h>
+	<stdlib.h>
 

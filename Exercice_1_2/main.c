@@ -67,30 +67,34 @@ void AdjToInc(struct Graphe *g){
 }
 
 void IncToAdj(struct Graphe *g){
-	int i,j,tailleX,tailleY;
-	int poids;
+    int i,j,tailleX,tailleY;
+    int poids;
 
-    tailleX=g->tailleInc-1;
-    tailleY=g->tailleX;
+    g->tailleY=g->tailleX;
 
-    for(i=0;i<tailleX+1;i++)
+
+    printf("données : \n");
+    printf("g.TailleX :%d \n",g->tailleX);
+    printf("g.TailleY :%d \n",g->tailleY);
+    printf("g.tailleInc :%d\n",g->tailleInc);
+
+
+
+    for(i=0;i<g->tailleInc;i++)
     {
-    	poids=g->matInc[g->tailleInc+1][i];
+        poids=g->matInc[g->tailleX][i];
+        //printf(" poids colonne %d =%d \n",i,poids);
 
-        for(j=0;j<g->tailleInc;j++)
+        for(j=0;j<g->tailleX;j++)
         {
-
-        	if(g->matInc[j][i]!=0)
-        	{
-        		//printf("poids : %d i: %d j: %d \n",poids,i,j);
-        		g->matAdj[j][i]=poids;
-        		g->matAdj[i][j]=poids;
-        	}
+            if(g->matInc[j][i]!=0)
+            {
+                //printf("poids : %d i: %d j: %d \n",poids,i,j);
+                g->matAdj[j][i]=poids;
+                g->matAdj[i][j]=poids;
+            }
         }
     }
-
-    g->tailleY=tailleY;
-
 }
 
 void afficherMatrice(struct Graphe g)
@@ -101,6 +105,11 @@ void afficherMatrice(struct Graphe g)
     int compteur=0;
 
     printf("x: %d,y: %d, inc: %d \n",g.tailleX,g.tailleY,g.tailleInc);
+
+    printf("données affichage : \n");
+	printf("g.TailleX :%d \n",g.tailleX);
+	printf("g.TailleY :%d \n",g.tailleY);
+	printf("g.tailleInc :%d\n",g.tailleInc);
 
 
     printf("Matrice d'adjacence:\n");
@@ -132,7 +141,6 @@ void afficherMatrice(struct Graphe g)
 		}
 		printf("\n");
 	}
-
 }
 
 struct Graphe getMatrice(char* nomFichier)
@@ -556,12 +564,6 @@ void menu(struct Graphe g1)
 int main()
 {
     struct Graphe g1;
-
-    //g1=setGraphe(ADJACENCE);
-    g1=getMatrice("matrice.txt");
-    //AdjToInc(&g1);
-    afficherMatrice(g1);
-
     g1=getMatrice("matriceIncidence.txt");
     //IncToAdj(&g1);
     afficherMatrice(g1);

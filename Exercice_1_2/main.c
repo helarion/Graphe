@@ -67,16 +67,23 @@ void IncToAdj(struct Matrice *m){
 	int i,j,tailleX,tailleY;
 	int poids;
 
-    tailleX=m->tailleInc-1;
-    tailleY=m->tailleX;
+	m->tailleY=m->tailleX;
 
-    for(i=0;i<tailleX+1;i++)
+
+	printf("données : \n");
+	printf("m.TailleX :%d \n",m->tailleX);
+	printf("m.TailleY :%d \n",m->tailleY);
+	printf("m.tailleInc :%d\n",m->tailleInc);
+
+
+
+    for(i=0;i<m->tailleInc;i++)
     {
-    	poids=m->matInc[m->tailleInc+1][i];
+    	poids=m->matInc[m->tailleX][i];
+    	//printf(" poids colonne %d =%d \n",i,poids);
 
-        for(j=0;j<m->tailleInc;j++)
+        for(j=0;j<m->tailleX;j++)
         {
-
         	if(m->matInc[j][i]!=0)
         	{
         		//printf("poids : %d i: %d j: %d \n",poids,i,j);
@@ -85,9 +92,6 @@ void IncToAdj(struct Matrice *m){
         	}
         }
     }
-
-    m->tailleY=tailleY;
-   
 }
 
 void afficherMatrice(struct Matrice m)
@@ -97,9 +101,13 @@ void afficherMatrice(struct Matrice m)
 
     int compteur=0;
 
-    printf("x: %d,y: %d, inc: %d \n",m.tailleX,m.tailleY,m.tailleInc);
 
+    printf("données affichage : \n");
+	printf("m.TailleX :%d \n",m.tailleX);
+	printf("m.TailleY :%d \n",m.tailleY);
+	printf("m.tailleInc :%d\n",m.tailleInc);
 
+    
     printf("Matrice d'adjacence:\n");
 	for(i=0;i<m.tailleX;i++)
 	{
@@ -129,6 +137,7 @@ void afficherMatrice(struct Matrice m)
 		}
 		printf("\n");
 	}
+	
 	
 }
 
@@ -556,12 +565,13 @@ break;
 
 */
 
-m1=getMatriceAdj("matrice.txt");
-//afficherMatrice(m1);
+m1=getMatriceInc("matriceInc2.txt");
+//IncToAdj(&m1);
+afficherMatrice(m1);
 
 //parcoursLargeur(m1);
 
-parcoursProfondeur(m1);
+//parcoursProfondeur(m1);
 
 return 0;
 }

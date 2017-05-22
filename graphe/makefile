@@ -1,0 +1,1 @@
+gcc main.c fonctions.c file.c pile.c

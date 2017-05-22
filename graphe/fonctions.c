@@ -34,6 +34,7 @@ void AdjToInc(struct Graphe *g)
     tailleX=g->tailleX;
     tailleY=g->tailleY;
 
+    // calcul du nombre d'arretes
     for(i=0;i<tailleX;i++)
     {
         for(j=i+1;j<tailleY;j++)
@@ -45,6 +46,7 @@ void AdjToInc(struct Graphe *g)
     g->tailleInc=c;
     c=0;
 
+    //conversion
     for(i=0;i<tailleX;i++)
     {
         for(j=i+1;j<tailleY;j++)
@@ -68,23 +70,14 @@ void IncToAdj(struct Graphe *g)
 
     g->tailleY=g->tailleX;
 
-
-    /*printf("données : \n");
-    printf("g.TailleX :%d \n",g->tailleX);
-    printf("g.TailleY :%d \n",g->tailleY);
-    printf("g.tailleInc :%d\n",g->tailleInc);*/
-
-
     for(i=0;i<g->tailleInc;i++)
     {
         poids=g->matInc[g->tailleX][i];
-        //printf(" poids colonne %d =%d \n",i,poids);
 
         for(j=0;j<g->tailleX;j++)
         {
             if(g->matInc[j][i]!=0)
             {
-                //printf("poids : %d i: %d j: %d \n",poids,i,j);
                 g->matAdj[j][i]=poids;
                 g->matAdj[i][j]=poids;
             }
@@ -95,8 +88,6 @@ void IncToAdj(struct Graphe *g)
 void afficherMatrice(struct Graphe g)
 {
     int i,j;
-
-    printf("x: %d,y: %d, inc: %d \n",g.tailleX,g.tailleY,g.tailleInc);
 
     printf("données affichage : \n");
 	printf("g.TailleX :%d \n",g.tailleX);
@@ -180,6 +171,7 @@ struct Graphe getMatrice(char* nomFichier)
                 g.matAdj[i][j]=c;
             }
         }
+        // calcul de la matrice d'incidence
         AdjToInc(&g);
     }
     else if(type==INCIDENCE)
@@ -196,6 +188,7 @@ struct Graphe getMatrice(char* nomFichier)
                 g.matInc[i][j]=c;
             }
         }
+        // calcul de la matrice d'adjacence
         IncToAdj(&g);
     }
     fclose(fp);
@@ -207,27 +200,30 @@ void saveGraphe(struct Graphe g)
     FILE *f;
     char nomGraphe [50];
     char chemin[50]="Graphes/";
-
+    int type;
+    printf("Entrez le type de graphe :\n");
+    printf("ADJACENCE :1\n");
+    printf("INCIDENCE :2\n");
+    char tmp[50];
+    scanf("%s",tmp);
+    type=atoi(tmp);
     printf("Entrez le nom de votre graphe:");
     scanf("%s",nomGraphe);
     strcat(chemin,nomGraphe);
     strcat(chemin,".txt");
-    printf("chemin:%s",chemin);
 
     f=fopen(chemin,"w");
     int i,j;
 
-    if(f == NULL) //if file does not exist, create it
+    if(f == NULL)
     {
         freopen(chemin, "w", f);
     }
     char write[100];
-    int type =1;
-    printf("test");
+
+    // récupération type et tailles
     sprintf(write, "%d", type);
-    printf("test");
     fprintf(f,"%s",write);
-    printf("test");
     fprintf(f," ");
     sprintf(write, "%d", g.tailleX);
     fprintf(f,"%s",write);
@@ -235,7 +231,8 @@ void saveGraphe(struct Graphe g)
     sprintf(write,"%d", g.tailleY);
     fprintf(f,"%s",write);
     fprintf(f,"\n");
-    printf("test");
+
+    // sauvegarde de la matrice
     for(i=0;i<g.tailleX;i++)
 	    {
 	        for(j=0;j<g.tailleY;j++)
@@ -246,7 +243,6 @@ void saveGraphe(struct Graphe g)
 	        }
 	        if(i<g.tailleX-1) fprintf(f,"\n");
 	    }
-    printf("fin");
     fclose(f);
 }
 
@@ -643,35 +639,44 @@ void chercherDijkstra(int graphe[100][100], int poids[3][100], int precedent[2][
 
 void Kruskal(struct Graphe g1){
 
+// Définit une arrète
+    struct Arrete{
+       int sommetA;
+       int sommetB;
+       int poids;
+       };
 
 
-	// 3 : dÃ©part, arrivÃ©e, valeur;
-	//50 : arbitraire <=> nombre d'acr possible
-
-	int listeArc [50][3];
+	//50 : arbitraire <=> nombre d'arc possible
+	struct Arrete listeArc[50];
 	int i,j;
-	int c=0;
+	int compteur=0;
+	int poidsTotal;
+    int Parent[20];
+    int origineA;
+    int origineB;
 
-
-	printf("donnÃ©es : \n");
-    printf("g.TailleX :%d \n",g1.tailleX);
-    printf("g.TailleY :%d \n",g1.tailleY);
-    printf("g.tailleInc :%d\n",g1.tailleInc);
-
-
+    // Remplissage de la liste d'arrètes à partir d'une matrice
 	for(i=0;i<g1.tailleInc;i++)
     {
         for(j=0;j<g1.tailleX;j++)
         {
-        	if(g1.matInc[j][i]==1){
-        		listeArc[i][c]=j;
-        		c++;
+        	if(g1.matInc[j][i]==1&&compteur==0){
+                listeArc[i].sommetA=j;
+                compteur++;
+        	}
+            if(g1.matInc[j][i]==1&&compteur>0){
+            listeArc[i].sommetB=j;
+            compteur++;
         	}
         }
-        c=0;
-        listeArc[i][2]=g1.matInc[g1.tailleX][i];
+        compteur=0;
+        listeArc[i].poids=g1.matInc[g1.tailleX][i];
     }
+    //////////////////////////////////////////////////////////
 
+
+    // Tri à bulle de la liste en fonction du poids des arrètes
 	int enOordre = 0;
     int tailleListe = g1.tailleInc;
     int temp;
@@ -680,116 +685,65 @@ void Kruskal(struct Graphe g1){
         enOordre = 1;
         for(i=0 ; i < tailleListe-1 ; i++)
         {
-            if(listeArc[i][2] > listeArc[i+1][2])
+            if(listeArc[i].poids > listeArc[i+1].poids)
             {
-            	temp=listeArc[i][2];
-            	listeArc[i][2]=listeArc[i+1][2];
-            	listeArc[i+1][2]=temp;
+            	temp=listeArc[i].poids;
+            	listeArc[i].poids=listeArc[i+1].poids;
+            	listeArc[i+1].poids=temp;
 
 
-                temp=listeArc[i][1];
-            	listeArc[i][1]=listeArc[i+1][1];
-            	listeArc[i+1][1]=temp;
+                temp=listeArc[i].sommetB;
+            	listeArc[i].sommetB=listeArc[i+1].sommetB;
+            	listeArc[i+1].sommetB=temp;
 
-                temp=listeArc[i][0];
-            	listeArc[i][0]=listeArc[i+1][0];
-            	listeArc[i+1][0]=temp;
+                temp=listeArc[i].sommetA;
+            	listeArc[i].sommetA=listeArc[i+1].sommetA;
+            	listeArc[i+1].sommetA=temp;
 
                 enOordre = 0;
             }
         }
         tailleListe--;
     }
+///////////////////////////////////////////////////////////////////
 
-    	for(i=0;i<g1.tailleInc;i++)
-    {
-        	printf("dÃ©part : %d, arrivÃ©e: %d, valeur: %d \n",listeArc[i][0],listeArc[i][1],listeArc[i][2]);
+    poidsTotal=0;
+    for(i=0;i<g1.tailleX;i++){
+        Parent[i]=i;
     }
+
+        printf("Les arrêtes choisies sont:\n");
+        for(i=0;i<g1.tailleInc;i++)
+        {
+           // Recherche de l'origine du premier sommet
+
+           j = Parent[listeArc[i].sommetA];
+
+           while(j != Parent[j]) j = Parent[j];
+           origineA=j;
+           // Recherche de l'origine du deuxième sommet
+           j = Parent[listeArc[i].sommetB];
+           while(j != Parent[j]) j = Parent[j];
+           origineB=j;
+           //comparaison des deux origines
+           if(origineA!=origineB) // Dans ce cas l'arrête ne crée pas de cycle
+           {
+               // Unir les deux groupements
+               Parent[origineB]=origineA;
+               // On affecte aux sommets leur origine comme parent
+               // pour accélérer la recherche des origines
+               Parent[listeArc[i].sommetA]=origineA;
+               Parent[listeArc[i].sommetB]=origineA;
+               // On somme les poids des arrêtes sélectionnées
+               poidsTotal+=listeArc[i].poids;
+
+
+               // On affiche les arrêtes qui ne créent pas de cycle
+               printf("(%d, %d) ",listeArc[i].sommetA,listeArc[i].sommetB);
+           }
+        }
+    printf("\nLe poids optimal est %d\n",poidsTotal);
 }
-
-/*
-void composanteFortementConnexe(int resultat[100][100], struct graphe graphe) {
-
-    int adjacence[100][100] = matrice;
-
-    int matricePuissance[100][100] = adjacence;
-    int puissance[100][100] = adjacence;
-    int puissance2[100][100];
-    int i,e;
-    int tailleMatPuissance=0;
-    int taillePuissance=0;
-    int taillePuissance2=0;
-    int tailleTmp=0;
-
-    for (i = 0; i < taillePuissance; i++) {
-        int tmp[100];
-
-        for (e = 0; e < taillePuissance; e++) {
-                tmp[tailleTmp]=0;
-                tailleTmp++;
-                puissance2[taillePuissance2][e]=0;
-        }
-    }
-
-    //On récupère ensuite la matrice contenant tout les chemins
-    while (!equal(puissance.begin(), puissance.end(), puissance2.begin())) {
-
-        puissance2 = puissance;
-        puissance = produitMatriciel(puissance, adjacence);
-
-        for (i = 0; i < tailleMatPuissance; i++) {
-
-            for (e = 0; e < matricePuissance[i].size(); e++) {
-                matricePuissance.at(i).at(e) += puissance.at(i).at(e);
-                if (matricePuissance.at(i).at(e) > 1)
-                    matricePuissance.at(i).at(e) = 1;
-            }
-
-        }
-
-    }
-
-    vector<vector<int>> composante;
-    vector<vector<int>> structure;
-
-    //On cherche ensuite les différentes composantes connexe
-    for (int i = 0; i < matricePuissance.size(); i++) {
-
-        vector<int> structSommet;
-
-        for (int e = 0; e < matricePuissance.at(i).size(); e++) {
-            structSommet.push_back(matricePuissance.at(e).at(i));
-        }
-
-        bool trouve = false;
-        int indiceComposante = 0;
-
-        //On parcourt les différentes colonnes que l'on a retenu
-        for (int e = 0; e < structure.size(); e++) {
-            if (equal(structure.at(e).begin(), structure.at(e).end(), structSommet.begin())) {
-                indiceComposante = e;
-                trouve = true;
-            }
-        }
-
-        //Si aucune n'a été trouvé on l'ajoute
-        if (!trouve) {
-            vector<int> tmp;
-            tmp.push_back(i);
-            composante.push_back(tmp);
-            structure.push_back(structSommet);
-        }
-        else { //Sinon on ajoute le sommet dans la composante
-            composante.at(indiceComposante).push_back(i);
-        }
-
-    }
-
-    //On retourne les composantes
-    return composante;
-
-}
-*/
 
 void menu(struct Graphe g1)
 {

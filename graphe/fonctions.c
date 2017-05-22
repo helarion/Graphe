@@ -15,11 +15,14 @@
 
 
 int TabFile[50];
+
+// sert au parcours en largeur
 File *maFile;
-Pile *maPile;
 int compteurSommetsPasses;
 int SommetsPasses[50];
 
+// sert au parcours en profondeur
+Pile *maPile;
 int sommetsMarques[50];
 int sommetsvisites[50];
 int compteurMarque;
@@ -733,37 +736,36 @@ void Kruskal(struct Graphe g1){
         Parent[i]=i;
     }
 
-        printf("Les arrêtes choisies sont:\n");
+        printf("Les arrèètes de l'arbre couvrant minimal sont :\n");
         for(i=0;i<g1.tailleInc;i++)
         {
-           // Recherche de l'origine du premier sommet
-
+            // recherche de cycle
            j = Parent[listeArc[i].sommetA];
-
-           while(j != Parent[j]) j = Parent[j];
+           while(j!=Parent[j]){
+                 j=Parent[j];
+           }
            origineA=j;
-           // Recherche de l'origine du deuxième sommet
+
            j = Parent[listeArc[i].sommetB];
-           while(j != Parent[j]) j = Parent[j];
-           origineB=j;
-           //comparaison des deux origines
-           if(origineA!=origineB) // Dans ce cas l'arrête ne crée pas de cycle
+           while(j != Parent[j])
            {
-               // Unir les deux groupements
+               j = Parent[j];
+           }
+           origineB=j;
+
+           // En cas de non-cycle :
+           if(origineA!=origineB)
+           {
                Parent[origineB]=origineA;
-               // On affecte aux sommets leur origine comme parent
-               // pour accélérer la recherche des origines
                Parent[listeArc[i].sommetA]=origineA;
                Parent[listeArc[i].sommetB]=origineA;
-               // On somme les poids des arrêtes sélectionnées
                poidsTotal+=listeArc[i].poids;
 
-
-               // On affiche les arrêtes qui ne créent pas de cycle
-               printf("(%d, %d) ",listeArc[i].sommetA,listeArc[i].sommetB);
+                // Affichage des arrètes retenues :
+               printf("[%d,%d] ",listeArc[i].sommetA,listeArc[i].sommetB);
            }
         }
-    printf("\nLe poids optimal est %d\n",poidsTotal);
+    printf("\nLe poids minimal est : %d\n",poidsTotal);
 }
 
 void menu(struct Graphe g1)

@@ -204,21 +204,23 @@ void saveGraphe(struct Graphe g)
     printf("Entrez le type de graphe :\n");
     printf("ADJACENCE :1\n");
     printf("INCIDENCE :2\n");
-    char tmp[50];
-    scanf("%s",tmp);
-    type=atoi(tmp);
-    printf("Entrez le nom de votre graphe:");
-    scanf("%s",nomGraphe);
+    scanf("%d",&type);
+
+    printf("Entrez le nom de graphe :\n");
+    scanf("%s",&nomGraphe);
+
     strcat(chemin,nomGraphe);
     strcat(chemin,".txt");
 
     f=fopen(chemin,"w");
+
     int i,j;
 
-    if(f == NULL)
+    if(f == NULL) //if file does not exist, create it
     {
         freopen(chemin, "w", f);
     }
+
     char write[100];
 
     // récupération type et tailles
@@ -228,21 +230,40 @@ void saveGraphe(struct Graphe g)
     sprintf(write, "%d", g.tailleX);
     fprintf(f,"%s",write);
     fprintf(f," ");
-    sprintf(write,"%d", g.tailleY);
+    sprintf(write,"%d", g.tailleInc);
     fprintf(f,"%s",write);
     fprintf(f,"\n");
 
-    // sauvegarde de la matrice
-    for(i=0;i<g.tailleX;i++)
-	    {
-	        for(j=0;j<g.tailleY;j++)
-	        {
-	        int TabFile[50];	sprintf(write, "%d", g.matAdj[i][j]);
-	        	if(j<g.tailleY-1) strcat(write," ");
-	        	fprintf(f,"%s",write);
-	        }
-	        if(i<g.tailleX-1) fprintf(f,"\n");
-	    }
+    switch(type)
+    {
+    case 1:
+         for(i=0;i<g.tailleX;i++)
+        {
+            for(j=0;j<g.tailleY;j++)
+            {
+                sprintf(write, "%d", g.matAdj[i][j]);
+                if(j<g.tailleX-1) strcat(write," ");
+                fprintf(f,"%s",write);
+            }
+            if(i<g.tailleX+1) fprintf(f,"\n");
+        }
+        break;
+    case 2:
+        for(i=0;i<g.tailleX+1;i++)
+        {
+            for(j=0;j<g.tailleInc;j++)
+            {
+                sprintf(write, "%d", g.matInc[i][j]);
+                if(j<g.tailleInc-1) strcat(write," ");
+                fprintf(f,"%s",write);
+            }
+            if(i<g.tailleX+1) fprintf(f,"\n");
+        }
+      break;
+    default:
+      printf("erreur");
+      break;
+    }
     fclose(f);
 }
 

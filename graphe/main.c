@@ -11,8 +11,8 @@ int main()
     afficherMatrice(g1);
 
     // création de matrice
-    setGraphe(1);
-    afficherMatrice(g1);
+    //setGraphe(1);
+    //afficherMatrice(g1);
 
     // sauvegarde de matrice
     saveGraphe(g1);

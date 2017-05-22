@@ -206,12 +206,13 @@ void saveGraphe(struct Graphe g)
 {
     FILE *f;
     char nomGraphe [50];
-    char chemin[50]="./";
+    char chemin[50]="Graphes/";
 
     printf("Entrez le nom de votre graphe:");
     scanf("%s",nomGraphe);
     strcat(chemin,nomGraphe);
     strcat(chemin,".txt");
+    printf("chemin:%s",chemin);
 
     f=fopen(chemin,"w");
     int i,j;
@@ -220,13 +221,21 @@ void saveGraphe(struct Graphe g)
     {
         freopen(chemin, "w", f);
     }
-    char* write="";
+    char write[100];
+    int type =1;
+    printf("test");
+    sprintf(write, "%d", type);
+    printf("test");
+    fprintf(f,"%s",write);
+    printf("test");
+    fprintf(f," ");
     sprintf(write, "%d", g.tailleX);
     fprintf(f,"%s",write);
     fprintf(f," ");
     sprintf(write,"%d", g.tailleY);
     fprintf(f,"%s",write);
     fprintf(f,"\n");
+    printf("test");
     for(i=0;i<g.tailleX;i++)
 	    {
 	        for(j=0;j<g.tailleY;j++)
@@ -237,6 +246,7 @@ void saveGraphe(struct Graphe g)
 	        }
 	        if(i<g.tailleX-1) fprintf(f,"\n");
 	    }
+    printf("fin");
     fclose(f);
 }
 
@@ -727,9 +737,9 @@ void composanteFortementConnexe(int resultat[100][100], struct graphe graphe) {
         puissance2 = puissance;
         puissance = produitMatriciel(puissance, adjacence);
 
-        for (int i = 0; i < matricePuissance.size(); i++) {
+        for (i = 0; i < tailleMatPuissance; i++) {
 
-            for (int e = 0; e < matricePuissance.at(i).size(); e++) {
+            for (e = 0; e < matricePuissance[i].size(); e++) {
                 matricePuissance.at(i).at(e) += puissance.at(i).at(e);
                 if (matricePuissance.at(i).at(e) > 1)
                     matricePuissance.at(i).at(e) = 1;

@@ -12,7 +12,7 @@ struct Graphe
 	int matInc[100][100]; // booleene
 };
 
-static void AdjToInc(struct Graphe *g);
+void AdjToInc(struct Graphe *g);
 
 void IncToAdj(struct Graphe *g);
 

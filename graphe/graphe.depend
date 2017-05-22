@@ -29,3 +29,33 @@
 
 1495414346 c:\users\axel\documents\github\graphe\graphe\fonctions.h
 
+1495409766 source:c:\users\thibault\desktop\projet_graphe\graphe\graphe\file.c
+	<stdio.h>
+	<stdlib.h>
+	"file.h"
+
+1495409766 c:\users\thibault\desktop\projet_graphe\graphe\graphe\file.h
+
+1495416222 source:c:\users\thibault\desktop\projet_graphe\graphe\graphe\main.c
+	<stdio.h>
+	<string.h>
+	"fonctions.h"
+
+1495416222 c:\users\thibault\desktop\projet_graphe\graphe\graphe\fonctions.h
+
+1495409766 source:c:\users\thibault\desktop\projet_graphe\graphe\graphe\pile.c
+	<stdio.h>
+	<stdlib.h>
+	"pile.h"
+
+1495409766 c:\users\thibault\desktop\projet_graphe\graphe\graphe\pile.h
+
+1495416771 source:c:\users\thibault\desktop\projet_graphe\graphe\graphe\fonctions.c
+	"file.h"
+	"pile.h"
+	<stdio.h>
+	<string.h>
+	<unistd.h>
+	<stdlib.h>
+	"fonctions.h"
+

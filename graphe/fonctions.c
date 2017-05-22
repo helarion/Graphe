@@ -206,28 +206,33 @@ void saveGraphe(struct Graphe g)
 {
     FILE *f;
     char nomGraphe [50];
-    char chemin[50]="Graphes/";
+    char chemin[50]="./";
+    int choix;
+    char write[100];
 
     printf("Entrez le nom de votre graphe:");
     scanf("%s",nomGraphe);
     strcat(chemin,nomGraphe);
     strcat(chemin,".txt");
-    printf("chemin:%s",chemin);
 
     f=fopen(chemin,"w");
     int i,j;
+    printf("enregistrer sous quel format ?\n");
+    printf("1)matrice adjacente\n");
+    printf("2)matrice incidente\n");
+    scanf("%d",&choix);
 
-    if(f == NULL) //if file does not exist, create it
+
+    switch (choix)
+    {
+    case 1:
+          if(f == NULL) //if file does not exist, create it
     {
         freopen(chemin, "w", f);
     }
-    char write[100];
-    int type =1;
-    printf("test");
-    sprintf(write, "%d", type);
-    printf("test");
+
+    sprintf(write, "%d", 1);
     fprintf(f,"%s",write);
-    printf("test");
     fprintf(f," ");
     sprintf(write, "%d", g.tailleX);
     fprintf(f,"%s",write);
@@ -235,18 +240,50 @@ void saveGraphe(struct Graphe g)
     sprintf(write,"%d", g.tailleY);
     fprintf(f,"%s",write);
     fprintf(f,"\n");
-    printf("test");
     for(i=0;i<g.tailleX;i++)
-	    {
-	        for(j=0;j<g.tailleY;j++)
-	        {
-	        int TabFile[50];	sprintf(write, "%d", g.matAdj[i][j]);
-	        	if(j<g.tailleY-1) strcat(write," ");
-	        	fprintf(f,"%s",write);
-	        }
-	        if(i<g.tailleX-1) fprintf(f,"\n");
-	    }
-    printf("fin");
+        {
+            for(j=0;j<g.tailleY;j++)
+            {
+                sprintf(write, "%d", g.matAdj[i][j]);
+                if(j<g.tailleY-1) strcat(write," ");
+                fprintf(f,"%s",write);
+            }
+            if(i<g.tailleX-1) fprintf(f,"\n");
+        }
+      break;
+    case 2:
+          if(f == NULL) //if file does not exist, create it
+    {
+        freopen(chemin, "w", f);
+    }
+
+    sprintf(write, "%d", 2);
+    fprintf(f,"%s",write);
+    fprintf(f," ");
+    sprintf(write, "%d", g.tailleX);
+    fprintf(f,"%s",write);
+    fprintf(f," ");
+    sprintf(write,"%d", g.tailleInc);
+    fprintf(f,"%s",write);
+    fprintf(f,"\n");
+    for(i=0;i<g.tailleX+1;i++)
+        {
+            for(j=0;j<g.tailleInc;j++)
+            {
+                sprintf(write, "%d", g.matInc[i][j]);
+                if(j<g.tailleInc-1) strcat(write," ");
+                fprintf(f,"%s",write);
+            }
+            if(i<g.tailleX+1) fprintf(f,"\n");
+        }
+      break;
+    default:
+      printf("erreur");
+      break;
+    }
+
+
+
     fclose(f);
 }
 
